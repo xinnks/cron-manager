@@ -1,3 +1,17 @@
+/**
+ * Returns a HTTP POST request options object
+ * @param {Object} body => http request body object
+ * @returns {Object}
+ */
+function init(body){
+  return {
+    body: JSON.stringify(body),
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json;charset=UTF-8',
+    },
+  }
+}
 
 /**
  * readRequestBody reads in the incoming request body
@@ -110,6 +124,33 @@ async function handleRequest(request) {
   })
 }
 
+async function triggerEvent(event) {  
+  switch (event.cron) {
+    case '25 3 * * *':
+      // Every 03:25
+      await triggerContentCollection();
+      break;
+}
+
+/**
+ * Triggers route that collects daily content for the "My Daily Reads" service
+ */
+async function triggerContentCollection(){
+  let reqBody = { secret: MDR_SECRET, count: 100};
+  const response = await fetch('https://mdr.jamesinkala.com/collect-content', init(reqBody));
+  const results = await readRequestBody(response);
+
+  await sendLogEmail({
+    user: {
+      email: "mdr@jamesinkala.com",
+      name: "MDR Dev"
+    },
+    message: {
+      subject: "Daily Content Collected",
+      message: `This was the received response: [${JSON.stringify(results)} ]`
+    }
+  })
+}
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
