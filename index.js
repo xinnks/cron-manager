@@ -180,3 +180,7 @@ async function triggerContentEmails(){
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
+
+addEventListener('scheduled', event => {
+  event.waitUntil(triggerEvent(event));
+});
