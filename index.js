@@ -130,6 +130,11 @@ async function triggerEvent(event) {
       // Every 03:25
       await triggerContentCollection();
       break;
+    case '30 3 * * *':
+      // Every 03:30
+      await triggerContentEmails();
+      break;
+  }
 }
 
 /**
@@ -151,6 +156,27 @@ async function triggerContentCollection(){
     }
   })
 }
+
+/**
+ * Triggers route that sends content emails to "My Daily Reads" subscribers
+ */
+async function triggerContentEmails(){
+  let reqBody = { secret: MDR_SECRET};
+  const response = await fetch('https://mdr.jamesinkala.com/send-emails', init(reqBody));
+  const results = await readRequestBody(response);
+
+  await sendLogEmail({
+    user: {
+      email: "mdr@jamesinkala.com",
+      name: "MDR Dev"
+    },
+    message: {
+      subject: "Content Emails Sent",
+      message: `This was the received response: [${JSON.stringify(results)} ]`
+    }
+  })
+}
+
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
