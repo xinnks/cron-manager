@@ -47,6 +47,22 @@ async function sendLogEmail(info){
       }
     ]
   };
+
+  return fetch(`https://api.mailjet.com/v3.1/send`, {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify(data),
+  })
+  .then(x => {
+    console.log("SENT EMAILS: ", JSON.stringify(x.json()));
+    return true;
+  })
+  .catch( e => {
+    return false;
+  })
+}
+
+/**
  * Respond with index html
  * @param {Request} request
  */
