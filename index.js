@@ -1,5 +1,52 @@
 
 /**
+ * Returns email Html markup
+ * @param {Object} data => email data object
+ */
+function logEmailHtml(data){
+  return `
+  <html>
+    <head>
+    <title>${data.subject}</title>
+    </head>
+    <body>
+      <h1> ${data.subject} </h1>
+      <p> ${data.message} </p>
+    </body>
+  </html>
+  `
+}
+
+/**
+ * @description This function sends a log email
+ * @param { Object } info => email information object
+**/
+async function sendLogEmail(info){
+  const FROM = {
+    Email: MDR_DEV_EMAIL,
+    Name: "My Daily Reads"
+  };
+  const HEADERS = {
+    Authorization:
+      'Basic ' + btoa(`${MAILJET_API_KEY}:${MAILJET_API_SECRET}`),
+    'Content-Type': 'application/json',
+  };
+  const data = {
+    Messages:[
+      {
+        From: FROM,
+        To: [
+          {
+            Email: info.user.email,
+            Name: info.user.name
+          }
+        ],
+        Subject: info.message.subject,
+        TextPart: info.message.message,
+        HTMLPart: logEmailHtml(info.message)
+      }
+    ]
+  };
  * Respond with index html
  * @param {Request} request
  */
